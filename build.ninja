@@ -1,0 +1,45 @@
+cc = clang-10
+llc = llc-10
+objcopy = llvm-objcopy-10
+objdump = llvm-objdump-10
+
+rule cc_kernel
+    deps = gcc
+    depfile = $out.d
+    command = $cc -Wall -Wextra -Werror -emit-llvm -O2 -MD -MF $out.d -c $in -o $out
+
+rule link_kernel
+    command = $llc -march=bpf -filetype=obj -o $out $in
+
+rule cc_host
+    deps = gcc
+    depfile = $out.d
+    command = $cc -Wall -Wextra -Wpedantic -Werror -MD -MF $out.d -c $in -o $out
+
+rule link_host
+    command = $cc $in -o $out
+
+rule extract
+    command = $objcopy -O binary --only-section=.text $in $out
+
+rule header
+    command = xxd -i $in $out
+
+rule objdump
+    command = $objdump -arch-name=bpf -S $in
+
+build bpf_entry.o: cc_kernel bpf_entry.c
+build bpf_entry: link_kernel bpf_entry.o
+build bpf_entry_text: extract bpf_entry
+build bpf_entry.h: header bpf_entry_text
+build dump_entry: objdump bpf_entry
+
+build bpf_return.o: cc_kernel bpf_return.c
+build bpf_return: link_kernel bpf_return.o
+build bpf_return_text: extract bpf_return
+build bpf_return.h: header bpf_return_text
+build dump_return: objdump bpf_return
+
+build loader.o: cc_host loader.c | bpf_entry.h bpf_return.h
+build bpf.o: cc_host libbpf/bpf.c
+build loader: link_host loader.o bpf.o
