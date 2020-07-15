@@ -48,3 +48,26 @@ build funclatency_exit.h: header funclatency_exit_text
 
 build funclatency.o: cc_host funclatency.c | funclatency_entry.h funclatency_exit.h
 build funclatency: link_host bpf.o loader.o funclatency.o
+
+build malloc_entry.o: cc_kernel malloc_entry.c
+build malloc_entry: link_kernel malloc_entry.o
+build malloc_entry_text: extract malloc_entry
+build malloc_entry.h: header malloc_entry_text
+
+build malloc_exit.o: cc_kernel malloc_exit.c
+build malloc_exit: link_kernel malloc_exit.o
+build malloc_exit_text: extract malloc_exit
+build malloc_exit.h: header malloc_exit_text
+
+build free_entry.o: cc_kernel free_entry.c
+build free_entry: link_kernel free_entry.o
+build free_entry_text: extract free_entry
+build free_entry.h: header free_entry_text
+
+build untracked_alloc_entry.o: cc_kernel untracked_alloc_entry.c
+build untracked_alloc_entry: link_kernel untracked_alloc_entry.o
+build untracked_alloc_entry_text: extract untracked_alloc_entry
+build untracked_alloc_entry.h: header untracked_alloc_entry_text
+
+build memleak.o: cc_host memleak.c | malloc_entry.h malloc_exit.h free_entry.h untracked_alloc_entry.h
+build memleak: link_host bpf.o loader.o memleak.o
