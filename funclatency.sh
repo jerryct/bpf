@@ -7,6 +7,8 @@
 
 set -eu
 
+script_root="$(cd "$(dirname "$0")" && pwd)"
+
 if [ $# -ne 2 ]
 then
   echo "Usage: funclatency.sh pid symbol_address"
@@ -21,4 +23,4 @@ echo "p:funclatency_entry $exe:$offset" > /sys/kernel/debug/tracing/uprobe_event
 echo "r:funclatency_return $exe:$offset" >> /sys/kernel/debug/tracing/uprobe_events
 cat /sys/kernel/debug/tracing/uprobe_events
 
-./loader
+exec "$script_root/loader"
