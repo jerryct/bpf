@@ -28,20 +28,18 @@ rule header
 rule objdump
     command = $objdump -arch-name=bpf -S $in
 
-build bpf_entry.o: cc_kernel bpf_entry.c
-build bpf_entry: link_kernel bpf_entry.o
-build bpf_entry_text: extract bpf_entry
-build bpf_entry.h: header bpf_entry_text
-build dump_entry: objdump bpf_entry
+build funclatency_entry.o: cc_kernel funclatency_entry.c
+build funclatency_entry: link_kernel funclatency_entry.o
+build funclatency_entry_text: extract funclatency_entry
+build funclatency_entry.h: header funclatency_entry_text
 
-build bpf_return.o: cc_kernel bpf_return.c
-build bpf_return: link_kernel bpf_return.o
-build bpf_return_text: extract bpf_return
-build bpf_return.h: header bpf_return_text
-build dump_return: objdump bpf_return
+build funclatency_exit.o: cc_kernel funclatency_exit.c
+build funclatency_exit: link_kernel funclatency_exit.o
+build funclatency_exit_text: extract funclatency_exit
+build funclatency_exit.h: header funclatency_exit_text
 
 build loader.o: cc_host loader.c
 build bpf.o: cc_host libbpf/bpf.c
 
-build funclatency.o: cc_host funclatency.c | bpf_entry.h bpf_return.h
+build funclatency.o: cc_host funclatency.c | funclatency_entry.h funclatency_exit.h
 build funclatency: link_host bpf.o loader.o funclatency.o

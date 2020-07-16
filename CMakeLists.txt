@@ -9,6 +9,6 @@ add_library(loader
 )
 
 add_library(bpf
-  bpf_entry.c
-  bpf_return.c
+  funclatency_entry.c
+  funclatency_exit.c
 )
