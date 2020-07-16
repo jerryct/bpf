@@ -4,6 +4,8 @@ project(bpf C)
 
 add_library(loader
   loader.c
+  loader.h
+  funclatency.c
 )
 
 add_library(bpf

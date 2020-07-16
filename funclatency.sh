@@ -23,4 +23,4 @@ echo "p:funclatency_entry $exe:$offset" > /sys/kernel/debug/tracing/uprobe_event
 echo "r:funclatency_return $exe:$offset" >> /sys/kernel/debug/tracing/uprobe_events
 cat /sys/kernel/debug/tracing/uprobe_events
 
-exec "$script_root/loader"
+exec "$script_root/funclatency"

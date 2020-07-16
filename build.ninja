@@ -40,6 +40,8 @@ build bpf_return_text: extract bpf_return
 build bpf_return.h: header bpf_return_text
 build dump_return: objdump bpf_return
 
-build loader.o: cc_host loader.c | bpf_entry.h bpf_return.h
+build loader.o: cc_host loader.c
 build bpf.o: cc_host libbpf/bpf.c
-build loader: link_host loader.o bpf.o
+
+build funclatency.o: cc_host funclatency.c | bpf_entry.h bpf_return.h
+build funclatency: link_host bpf.o loader.o funclatency.o
