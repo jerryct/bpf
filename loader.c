@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "loader.h"
 #include "libbpf/bpf.h"
 #include <errno.h>

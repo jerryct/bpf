@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "funclatency_entry.h"
 #include "funclatency_exit.h"
 #include "libbpf/bpf.h"
