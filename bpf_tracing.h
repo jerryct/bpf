@@ -143,7 +143,7 @@ struct pt_regs;
 #define PT_REGS_PARM5(x) ((x)->regs[8])
 #define PT_REGS_RET(x) ((x)->regs[31])
 #define PT_REGS_FP(x) ((x)->regs[30]) /* Works only with CONFIG_FRAME_POINTER */
-#define PT_REGS_RC(x) ((x)->regs[1])
+#define PT_REGS_RC(x) ((x)->regs[2])
 #define PT_REGS_SP(x) ((x)->regs[29])
 #define PT_REGS_IP(x) ((x)->cp0_epc)
 
