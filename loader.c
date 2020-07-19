@@ -43,7 +43,7 @@ static __u64 read_probe_id(const char *s) {
   return id;
 }
 
-void attach(const struct bpf_insn *const prog, const __u32 len, const char *const probe) {
+void attach(const struct bpf_insn *const prog, const __u32 len, const pid_t pid, const char *const probe) {
   char log[BPF_LOG_BUF_SIZE] = {0};
   const int pfd = bpf_load_program(BPF_PROG_TYPE_KPROBE, prog, len, "GPL", LINUX_VERSION_CODE, log, sizeof(log));
   if (pfd < 0) {
@@ -59,7 +59,7 @@ void attach(const struct bpf_insn *const prog, const __u32 len, const char *cons
   pattr.wakeup_events = 1;
   pattr.config = read_probe_id(probe);
   pattr.size = sizeof(pattr);
-  const int efd = syscall(SYS_perf_event_open, &pattr, -1, 0, -1, 0);
+  const int efd = syscall(SYS_perf_event_open, &pattr, pid, 0, -1, 0);
   ENSURES(efd >= 0, "cannot open event");
   const int ret_enable = ioctl(efd, PERF_EVENT_IOC_ENABLE, 0);
   ENSURES(ret_enable >= 0, "cannot enable event");
