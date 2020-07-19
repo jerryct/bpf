@@ -28,6 +28,14 @@ rule header
 rule objdump
     command = $objdump -arch-name=bpf -S $in
 
+rule format
+    command = clang-format-8 -i -style="{BasedOnStyle: llvm, ColumnLimit: 120}" *.h *.c
+
+build format: format
+
+build loader.o: cc_host loader.c
+build bpf.o: cc_host libbpf/bpf.c
+
 build funclatency_entry.o: cc_kernel funclatency_entry.c
 build funclatency_entry: link_kernel funclatency_entry.o
 build funclatency_entry_text: extract funclatency_entry
@@ -37,9 +45,6 @@ build funclatency_exit.o: cc_kernel funclatency_exit.c
 build funclatency_exit: link_kernel funclatency_exit.o
 build funclatency_exit_text: extract funclatency_exit
 build funclatency_exit.h: header funclatency_exit_text
-
-build loader.o: cc_host loader.c
-build bpf.o: cc_host libbpf/bpf.c
 
 build funclatency.o: cc_host funclatency.c | funclatency_entry.h funclatency_exit.h
 build funclatency: link_host bpf.o loader.o funclatency.o
