@@ -14,7 +14,7 @@
   do {                                                                                                                 \
     const int condition = c;                                                                                           \
     if (!condition) {                                                                                                  \
-      printf("loader [%s:%d (%s)] %s: %s\n", __FILE__, __LINE__, __func__, s, strerror(errno));                        \
+      printf("loader [%s:%d (%s)] %s - errno: %s\n", __FILE__, __LINE__, __func__, s, strerror(errno));                \
       exit(EXIT_FAILURE);                                                                                              \
     }                                                                                                                  \
   } while (0)
