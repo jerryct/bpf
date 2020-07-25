@@ -39,34 +39,38 @@ int main(const int argc, char *argv[]) {
   const int s_fd = bpf_create_map(BPF_MAP_TYPE_HASH, sizeof(__u64), sizeof(__u64), 1000, 0);
   const int a_fd = bpf_create_map(BPF_MAP_TYPE_HASH, sizeof(__u64), sizeof(struct alloc_info_t), 1000000, 0);
 
-  struct bpf_insn *const malloc_entry = (struct bpf_insn *)malloc_entry_text;
-  const __u32 malloc_entry_len = malloc_entry_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(malloc_entry, malloc_entry_len, 0x23, ca_fd);
-  relocate_map_fd(malloc_entry, malloc_entry_len, 0x42, s_fd);
-  relocate_map_fd(malloc_entry, malloc_entry_len, 0x72, a_fd);
-  attach(malloc_entry, malloc_entry_len, pid, "/sys/kernel/debug/tracing/events/uprobes/malloc_entry/id");
+  struct bpf_insn *const malloc_entry_prog = (struct bpf_insn *)malloc_entry;
+  const __u32 malloc_entry_prog_len = malloc_entry_len / sizeof(struct bpf_insn);
+  relocate_map_fd(malloc_entry_prog, malloc_entry_prog_len, 0x23, ca_fd);
+  relocate_map_fd(malloc_entry_prog, malloc_entry_prog_len, 0x42, s_fd);
+  relocate_map_fd(malloc_entry_prog, malloc_entry_prog_len, 0x72, a_fd);
+  attach(malloc_entry_prog, malloc_entry_prog_len, pid, "/sys/kernel/debug/tracing/events/uprobes/malloc_entry/id");
 
-  struct bpf_insn *const malloc_exit = (struct bpf_insn *)malloc_exit_text;
-  const __u32 malloc_exit_len = malloc_exit_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(malloc_exit, malloc_exit_len, 0x23, ca_fd);
-  relocate_map_fd(malloc_exit, malloc_exit_len, 0x42, s_fd);
-  relocate_map_fd(malloc_exit, malloc_exit_len, 0x72, a_fd);
-  attach(malloc_exit, malloc_exit_len, pid, "/sys/kernel/debug/tracing/events/uprobes/malloc_exit/id");
+  struct bpf_insn *const malloc_exit_prog = (struct bpf_insn *)malloc_exit;
+  const __u32 malloc_exit_prog_len = malloc_exit_len / sizeof(struct bpf_insn);
+  relocate_map_fd(malloc_exit_prog, malloc_exit_prog_len, 0x23, ca_fd);
+  relocate_map_fd(malloc_exit_prog, malloc_exit_prog_len, 0x42, s_fd);
+  relocate_map_fd(malloc_exit_prog, malloc_exit_prog_len, 0x72, a_fd);
+  attach(malloc_exit_prog, malloc_exit_prog_len, pid, "/sys/kernel/debug/tracing/events/uprobes/malloc_exit/id");
 
-  struct bpf_insn *const free_entry = (struct bpf_insn *)free_entry_text;
-  const __u32 free_entry_len = free_entry_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(free_entry, free_entry_len, 0x23, ca_fd);
-  relocate_map_fd(free_entry, free_entry_len, 0x42, s_fd);
-  relocate_map_fd(free_entry, free_entry_len, 0x72, a_fd);
-  attach(free_entry, free_entry_len, pid, "/sys/kernel/debug/tracing/events/uprobes/free_entry/id");
+  struct bpf_insn *const free_entry_prog = (struct bpf_insn *)free_entry;
+  const __u32 free_entry_prog_len = free_entry_len / sizeof(struct bpf_insn);
+  relocate_map_fd(free_entry_prog, free_entry_prog_len, 0x23, ca_fd);
+  relocate_map_fd(free_entry_prog, free_entry_prog_len, 0x42, s_fd);
+  relocate_map_fd(free_entry_prog, free_entry_prog_len, 0x72, a_fd);
+  attach(free_entry_prog, free_entry_prog_len, pid, "/sys/kernel/debug/tracing/events/uprobes/free_entry/id");
 
-  struct bpf_insn *const untracked_alloc = (struct bpf_insn *)untracked_alloc_entry_text;
-  const __u32 untracked_alloc_len = untracked_alloc_entry_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(untracked_alloc, untracked_alloc_len, 0x23, ca_fd);
-  attach(untracked_alloc, untracked_alloc_len, pid, "/sys/kernel/debug/tracing/events/uprobes/calloc_entry/id");
-  attach(untracked_alloc, untracked_alloc_len, pid, "/sys/kernel/debug/tracing/events/uprobes/realloc_entry/id");
-  attach(untracked_alloc, untracked_alloc_len, pid, "/sys/kernel/debug/tracing/events/uprobes/posix_memalign_entry/id");
-  attach(untracked_alloc, untracked_alloc_len, pid, "/sys/kernel/debug/tracing/events/uprobes/aligned_alloc_entry/id");
+  struct bpf_insn *const untracked_alloc_prog = (struct bpf_insn *)untracked_alloc_entry;
+  const __u32 untracked_alloc_prog_len = untracked_alloc_entry_len / sizeof(struct bpf_insn);
+  relocate_map_fd(untracked_alloc_prog, untracked_alloc_prog_len, 0x23, ca_fd);
+  attach(untracked_alloc_prog, untracked_alloc_prog_len, pid,
+         "/sys/kernel/debug/tracing/events/uprobes/calloc_entry/id");
+  attach(untracked_alloc_prog, untracked_alloc_prog_len, pid,
+         "/sys/kernel/debug/tracing/events/uprobes/realloc_entry/id");
+  attach(untracked_alloc_prog, untracked_alloc_prog_len, pid,
+         "/sys/kernel/debug/tracing/events/uprobes/posix_memalign_entry/id");
+  attach(untracked_alloc_prog, untracked_alloc_prog_len, pid,
+         "/sys/kernel/debug/tracing/events/uprobes/aligned_alloc_entry/id");
 
   while (1) {
     sleep(1);

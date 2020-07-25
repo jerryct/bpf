@@ -20,7 +20,7 @@ rule link_host
     command = $cc $in -o $out
 
 rule extract
-    command = $objcopy -O binary --only-section=.text $in $out
+    command = $objcopy -O binary --only-section=.$out $in $out
 
 rule header
     command = xxd -i $in $out
@@ -36,38 +36,28 @@ build format: format
 build loader.o: cc_host loader.c
 build bpf.o: cc_host libbpf/bpf.c
 
-build funclatency_entry.o: cc_kernel funclatency_entry.c
-build funclatency_entry: link_kernel funclatency_entry.o
-build funclatency_entry_text: extract funclatency_entry
-build funclatency_entry.h: header funclatency_entry_text
+build funclatency_kernel.o: cc_kernel funclatency_kernel.c
+build funclatency_kernel.elf: link_kernel funclatency_kernel.o
 
-build funclatency_exit.o: cc_kernel funclatency_exit.c
-build funclatency_exit: link_kernel funclatency_exit.o
-build funclatency_exit_text: extract funclatency_exit
-build funclatency_exit.h: header funclatency_exit_text
+build funclatency_entry: extract funclatency_kernel.elf
+build funclatency_entry.h: header funclatency_entry
+build funclatency_exit: extract funclatency_kernel.elf
+build funclatency_exit.h: header funclatency_exit
 
 build funclatency.o: cc_host funclatency.c | funclatency_entry.h funclatency_exit.h
 build funclatency: link_host bpf.o loader.o funclatency.o
 
-build malloc_entry.o: cc_kernel malloc_entry.c
-build malloc_entry: link_kernel malloc_entry.o
-build malloc_entry_text: extract malloc_entry
-build malloc_entry.h: header malloc_entry_text
+build memleak_kernel.o: cc_kernel memleak_kernel.c
+build memleak_kernel.elf: link_kernel memleak_kernel.o
 
-build malloc_exit.o: cc_kernel malloc_exit.c
-build malloc_exit: link_kernel malloc_exit.o
-build malloc_exit_text: extract malloc_exit
-build malloc_exit.h: header malloc_exit_text
-
-build free_entry.o: cc_kernel free_entry.c
-build free_entry: link_kernel free_entry.o
-build free_entry_text: extract free_entry
-build free_entry.h: header free_entry_text
-
-build untracked_alloc_entry.o: cc_kernel untracked_alloc_entry.c
-build untracked_alloc_entry: link_kernel untracked_alloc_entry.o
-build untracked_alloc_entry_text: extract untracked_alloc_entry
-build untracked_alloc_entry.h: header untracked_alloc_entry_text
+build malloc_entry: extract memleak_kernel.elf
+build malloc_entry.h: header malloc_entry
+build malloc_exit: extract memleak_kernel.elf
+build malloc_exit.h: header malloc_exit
+build free_entry: extract memleak_kernel.elf
+build free_entry.h: header free_entry
+build untracked_alloc_entry: extract memleak_kernel.elf
+build untracked_alloc_entry.h: header untracked_alloc_entry
 
 build memleak.o: cc_host memleak.c | malloc_entry.h malloc_exit.h free_entry.h untracked_alloc_entry.h
 build memleak: link_host bpf.o loader.o memleak.o

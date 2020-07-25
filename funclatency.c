@@ -22,16 +22,18 @@ int main(void) {
   const int mfd = bpf_create_map(BPF_MAP_TYPE_HASH, sizeof(__u32), sizeof(__u64), 256, 0);
   const int sfd = bpf_create_map(BPF_MAP_TYPE_ARRAY, sizeof(__u32), sizeof(__u64), 2, 0);
 
-  struct bpf_insn *const funclatency_entry = (struct bpf_insn *)funclatency_entry_text;
-  const __u32 funclatency_entry_len = funclatency_entry_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(funclatency_entry, funclatency_entry_len, 0x23, mfd);
-  attach(funclatency_entry, funclatency_entry_len, -1, "/sys/kernel/debug/tracing/events/uprobes/funclatency_entry/id");
+  struct bpf_insn *const funclatency_entry_prog = (struct bpf_insn *)funclatency_entry;
+  const __u32 funclatency_entry_prog_len = funclatency_entry_len / sizeof(struct bpf_insn);
+  relocate_map_fd(funclatency_entry_prog, funclatency_entry_prog_len, 0x23, mfd);
+  attach(funclatency_entry_prog, funclatency_entry_prog_len, -1,
+         "/sys/kernel/debug/tracing/events/uprobes/funclatency_entry/id");
 
-  struct bpf_insn *const funclatency_exit = (struct bpf_insn *)funclatency_exit_text;
-  const __u32 funclatency_exit_len = funclatency_exit_text_len / sizeof(struct bpf_insn);
-  relocate_map_fd(funclatency_exit, funclatency_exit_len, 0x23, mfd);
-  relocate_map_fd(funclatency_exit, funclatency_exit_len, 0x42, sfd);
-  attach(funclatency_exit, funclatency_exit_len, -1, "/sys/kernel/debug/tracing/events/uprobes/funclatency_return/id");
+  struct bpf_insn *const funclatency_prog_exit = (struct bpf_insn *)funclatency_exit;
+  const __u32 funclatency_exit_prog_len = funclatency_exit_len / sizeof(struct bpf_insn);
+  relocate_map_fd(funclatency_prog_exit, funclatency_exit_prog_len, 0x23, mfd);
+  relocate_map_fd(funclatency_prog_exit, funclatency_exit_prog_len, 0x42, sfd);
+  attach(funclatency_prog_exit, funclatency_exit_prog_len, -1,
+         "/sys/kernel/debug/tracing/events/uprobes/funclatency_return/id");
 
   while (1) {
     sleep(1);
