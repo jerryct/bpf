@@ -16,8 +16,7 @@ then
 fi
 
 exe=`ls -l /proc/$1/exe | awk '{ print $(NF) }'`
-address=`cat /proc/$1/maps | grep "$exe" | grep r-xp | awk 'NR==1 { n = split($1,a,"-"); print a[1] }'`
-offset=`printf "0x%X\n" $((0x$2 - 0x$address))`
+offset=`objdump -tT --demangle /proc/$1/exe | grep "$2" | awk -e '{ print "0x"$1 }'`
 
 echo "p:funclatency_entry $exe:$offset" > /sys/kernel/debug/tracing/uprobe_events
 echo "r:funclatency_return $exe:$offset" >> /sys/kernel/debug/tracing/uprobe_events
