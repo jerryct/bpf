@@ -2,10 +2,6 @@
 
 #include <linux/types.h>
 
-// combined_allocs := 23
-// sizes := 42
-// allocs := 72
-
 struct alloc_info_t {
   __u64 size;
   __u64 timestamp_ns;

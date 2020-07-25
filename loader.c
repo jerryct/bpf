@@ -18,14 +18,19 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void relocate_map_fd(struct bpf_insn *const insn, const int n, const int p, const int fd) {
+static __s32 at(const struct relocations relocs, const __s32 key) {
+  ENSURES(key < relocs.size, "unknown mapping");
+  return relocs.fds[key];
+}
+
+void relocate_map_fd(struct bpf_insn *const insn, const int n, const struct relocations relocs) {
   for (int i = 0; i < n; ++i) {
-    if ((insn[i].code == BPF_DW) && (insn[i + 1].imm == p)) {
-      printf("insn[%d]: %x %x %x %x %x", i, insn[i].code, insn[i].dst_reg, insn[i].src_reg, insn[i].off, insn[i].imm);
+    if ((insn[i].code == BPF_DW) && (insn[i + 1].imm == (__s32)0xFFFFFF23)) {
+      printf("insn[%d]: ... %x %x", i, insn[i].imm, insn[i + 1].imm);
       insn[i].src_reg = BPF_PSEUDO_MAP_FD;
-      insn[i].imm = fd;
+      insn[i].imm = at(relocs, insn[i].imm);
       insn[i + 1].imm = 0;
-      printf(" -> %x %x %x %x %x\n", insn[i].code, insn[i].dst_reg, insn[i].src_reg, insn[i].off, insn[i].imm);
+      printf(" -> ... %x %x\n", insn[i].imm, insn[i + 1].imm);
     }
   }
 }

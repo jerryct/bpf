@@ -19,7 +19,12 @@
     }                                                                                                                  \
   } while (0)
 
-void relocate_map_fd(struct bpf_insn *const insn, const int n, const int p, const int fd);
+struct relocations {
+  const int *fds;
+  int size;
+};
+
+void relocate_map_fd(struct bpf_insn *const insn, const int n, const struct relocations relocs);
 void attach(const struct bpf_insn *const prog, const __u32 len, const pid_t pid, const char *const probe);
 void set_rlimit();
 
