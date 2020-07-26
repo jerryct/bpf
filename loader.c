@@ -18,19 +18,24 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+struct program as_program(unsigned char *const insn, const unsigned len) {
+  const struct program p = {.insn = (struct bpf_insn *)insn, .len = len / sizeof(struct bpf_insn)};
+  return p;
+}
+
 static __s32 at(const struct relocations relocs, const __s32 key) {
   ENSURES(key < relocs.size, "unknown mapping");
   return relocs.fds[key];
 }
 
-void relocate_map_fd(struct bpf_insn *const insn, const int n, const struct relocations relocs) {
-  for (int i = 0; i < n; ++i) {
-    if ((insn[i].code == BPF_DW) && (insn[i + 1].imm == (__s32)0xFFFFFF23)) {
-      printf("insn[%d]: ... %x %x", i, insn[i].imm, insn[i + 1].imm);
-      insn[i].src_reg = BPF_PSEUDO_MAP_FD;
-      insn[i].imm = at(relocs, insn[i].imm);
-      insn[i + 1].imm = 0;
-      printf(" -> ... %x %x\n", insn[i].imm, insn[i + 1].imm);
+void relocate_map_fd(const struct program prog, const struct relocations relocs) {
+  for (int i = 0; i < prog.len; ++i) {
+    if ((prog.insn[i].code == BPF_DW) && (prog.insn[i + 1].imm == (__s32)0xFFFFFF23)) {
+      printf("prog.insn[%d]: ... %x %x", i, prog.insn[i].imm, prog.insn[i + 1].imm);
+      prog.insn[i].src_reg = BPF_PSEUDO_MAP_FD;
+      prog.insn[i].imm = at(relocs, prog.insn[i].imm);
+      prog.insn[i + 1].imm = 0;
+      printf(" -> ... %x %x\n", prog.insn[i].imm, prog.insn[i + 1].imm);
     }
   }
 }
@@ -48,9 +53,10 @@ static __u64 read_probe_id(const char *s) {
   return id;
 }
 
-void attach(const struct bpf_insn *const prog, const __u32 len, const pid_t pid, const char *const probe) {
+void attach(const struct program prog, const pid_t pid, const char *const probe) {
   char log[BPF_LOG_BUF_SIZE] = {0};
-  const int pfd = bpf_load_program(BPF_PROG_TYPE_KPROBE, prog, len, "GPL", LINUX_VERSION_CODE, log, sizeof(log));
+  const int pfd =
+      bpf_load_program(BPF_PROG_TYPE_KPROBE, prog.insn, prog.len, "GPL", LINUX_VERSION_CODE, log, sizeof(log));
   if (pfd < 0) {
     printf("cannot load BPF program: %s\n", strerror(errno));
     printf(">>>>\n%s<<<<\n", log);

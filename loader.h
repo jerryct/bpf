@@ -24,8 +24,14 @@ struct relocations {
   int size;
 };
 
-void relocate_map_fd(struct bpf_insn *const insn, const int n, const struct relocations relocs);
-void attach(const struct bpf_insn *const prog, const __u32 len, const pid_t pid, const char *const probe);
+struct program {
+  struct bpf_insn *insn;
+  int len;
+};
+
+struct program as_program(unsigned char *const insn, const unsigned len);
+void relocate_map_fd(const struct program prog, const struct relocations relocs);
+void attach(const struct program prog, const pid_t pid, const char *const probe);
 void set_rlimit();
 
 #endif // LOADER_H

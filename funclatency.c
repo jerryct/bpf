@@ -24,17 +24,13 @@ int main(void) {
   const int map[] = {mfd, sfd};
   const struct relocations relocs = {.fds = map, .size = sizeof(map) / sizeof(map[0])};
 
-  struct bpf_insn *const funclatency_entry_prog = (struct bpf_insn *)funclatency_entry;
-  const __u32 funclatency_entry_prog_len = funclatency_entry_len / sizeof(struct bpf_insn);
-  relocate_map_fd(funclatency_entry_prog, funclatency_entry_prog_len, relocs);
-  attach(funclatency_entry_prog, funclatency_entry_prog_len, -1,
-         "/sys/kernel/debug/tracing/events/uprobes/funclatency_entry/id");
+  const struct program funclatency_entry_prog = as_program(funclatency_entry, funclatency_entry_len);
+  relocate_map_fd(funclatency_entry_prog, relocs);
+  attach(funclatency_entry_prog, -1, "/sys/kernel/debug/tracing/events/uprobes/funclatency_entry/id");
 
-  struct bpf_insn *const funclatency_prog_exit = (struct bpf_insn *)funclatency_exit;
-  const __u32 funclatency_exit_prog_len = funclatency_exit_len / sizeof(struct bpf_insn);
-  relocate_map_fd(funclatency_prog_exit, funclatency_exit_prog_len, relocs);
-  attach(funclatency_prog_exit, funclatency_exit_prog_len, -1,
-         "/sys/kernel/debug/tracing/events/uprobes/funclatency_return/id");
+  const struct program funclatency_prog_exit = as_program(funclatency_exit, funclatency_exit_len);
+  relocate_map_fd(funclatency_prog_exit, relocs);
+  attach(funclatency_prog_exit, -1, "/sys/kernel/debug/tracing/events/uprobes/funclatency_return/id");
 
   while (1) {
     sleep(1);
