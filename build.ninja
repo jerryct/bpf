@@ -14,7 +14,7 @@ rule link_kernel
 rule cc_host
     deps = gcc
     depfile = $out.d
-    command = $cc -Wall -Wextra -Wpedantic -Werror -MD -MF $out.d -c $in -o $out
+    command = $cc -Wall -Wextra -Wpedantic -Werror -O2 -MD -MF $out.d -c $in -o $out
 
 rule link_host
     command = $cc $in -o $out
