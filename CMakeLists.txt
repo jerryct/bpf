@@ -16,7 +16,7 @@ target_link_libraries(loader PRIVATE bpf)
 add_executable(funclatency funclatency.c)
 target_link_libraries(funclatency PRIVATE loader)
 
-add_executable(memleak memleak.c)
+add_executable(memleak memleak.c memleak.h)
 target_link_libraries(memleak PRIVATE loader)
 
 add_library(kernels
