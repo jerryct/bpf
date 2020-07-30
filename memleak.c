@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 
 #include "memleak.h"
+#include "conditions.h"
 #include "free_entry.h"
 #include "libbpf/bpf.h"
 #include "loader.h"
 #include "malloc_entry.h"
 #include "malloc_exit.h"
 #include "untracked_alloc_entry.h"
+#include <errno.h>
 #include <limits.h>
 #include <linux/bpf.h>
 #include <linux/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 static inline pid_t GetPid(const char *const buff) {

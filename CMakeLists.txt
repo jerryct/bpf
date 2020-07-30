@@ -8,6 +8,7 @@ add_library(bpf
 )
 
 add_library(loader
+  conditions.h
   loader.c
   loader.h
 )
