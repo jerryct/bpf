@@ -33,8 +33,9 @@ rule format
 
 build format: format
 
-build loader.o: cc_host loader.c
 build bpf.o: cc_host libbpf/bpf.c
+build loader.o: cc_host loader.c
+build symbolizer.o: cc_host symbolizer.c
 
 build funclatency_kernel.o: cc_kernel funclatency_kernel.c
 build funclatency_kernel.elf: link_kernel funclatency_kernel.o

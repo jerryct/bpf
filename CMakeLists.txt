@@ -11,6 +11,8 @@ add_library(loader
   conditions.h
   loader.c
   loader.h
+  symbolizer.c
+  symbolizer.h
 )
 target_link_libraries(loader PRIVATE bpf)
 
