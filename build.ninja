@@ -6,7 +6,7 @@ objdump = llvm-objdump-10
 rule cc_kernel
     deps = gcc
     depfile = $out.d
-    command = $cc -target bpf -isystem /usr/include/x86_64-linux-gnu -D__TARGET_ARCH_x86 -Wall -Wextra -Werror -emit-llvm -O2 -MD -MF $out.d -c $in -o $out
+    command = $cc -target bpf -isystem /usr/include/x86_64-linux-gnu -D__TARGET_ARCH_x86 -D__SANE_USERSPACE_TYPES__ -Wall -Wextra -Werror -emit-llvm -O2 -MD -MF $out.d -c $in -o $out
 
 rule link_kernel
     command = $llc -march=bpf -filetype=obj -o $out $in
@@ -14,7 +14,7 @@ rule link_kernel
 rule cc_host
     deps = gcc
     depfile = $out.d
-    command = $cc -Wall -Wextra -Wpedantic -Werror -O2 -MD -MF $out.d -c $in -o $out
+    command = $cc -Wall -Wextra -Wpedantic -Werror -D__SANE_USERSPACE_TYPES__ -O2 -MD -MF $out.d -c $in -o $out
 
 rule link_host
     command = $cc $in -o $out
