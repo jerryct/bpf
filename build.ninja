@@ -62,3 +62,11 @@ build untracked_alloc_entry.h: header untracked_alloc_entry
 
 build memleak.o: cc_host memleak.c | malloc_entry.h malloc_exit.h free_entry.h untracked_alloc_entry.h
 build memleak: link_host bpf.o loader.o memleak.o
+
+build stackcount_kernel.o: cc_kernel stackcount_kernel.c
+build stackcount_kernel.elf: link_kernel stackcount_kernel.o
+build stackcount_entry: extract stackcount_kernel.elf
+build stackcount_entry.h: header stackcount_entry
+
+build stackcount.o: cc_host stackcount.c | stackcount_entry.h
+build stackcount: link_host bpf.o loader.o symbolizer.o stackcount.o

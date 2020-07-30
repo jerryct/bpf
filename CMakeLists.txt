@@ -22,10 +22,15 @@ target_link_libraries(funclatency PRIVATE loader)
 add_executable(memleak memleak.c memleak.h)
 target_link_libraries(memleak PRIVATE loader)
 
+add_executable(stackcount stackcount.c stackcount.h)
+target_link_libraries(stackcount PRIVATE loader)
+
 add_library(kernels
   bpf_helpers.h
   bpf_tracing.h
   funclatency_kernel.c
   memleak.h
   memleak_kernel.c
+  stackcount.h
+  stackcount_kernel.c
 )
