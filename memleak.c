@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static inline pid_t GetPid(const char *const buff) {
+static pid_t get_pid(const char *const buff) {
   char *end;
   errno = 0;
 
@@ -34,7 +34,7 @@ static inline pid_t GetPid(const char *const buff) {
 int main(const int argc, char *argv[]) {
   ENSURES(argc == 2, "pid is missing");
 
-  const pid_t pid = GetPid(argv[1]);
+  const pid_t pid = get_pid(argv[1]);
 
   set_rlimit();
 
