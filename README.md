@@ -26,7 +26,7 @@ ninja
 ## Examples
 
 ```
-sudo ./funclatency.sh $(pgrep a.out) 'Foo
+sudo ./funclatency.sh $(pidof a.out) 'Foo'
 sudo ./memleak.sh $(pidof a.out)
 sudo ./stackcount.sh $(pidof a.out) 'Foo'
 ```
