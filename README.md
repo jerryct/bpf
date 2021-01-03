@@ -26,9 +26,47 @@ ninja
 ## Examples
 
 ```
-sudo ./funclatency.sh $(pidof a.out) 'Foo'
-sudo ./memleak.sh $(pidof a.out)
-sudo ./stackcount.sh $(pidof a.out) 'Foo'
+$ cat function.c
+#include <unistd.h>
+
+int __attribute__ ((noinline)) Foo(int x) {
+  sleep(1);
+  return x;
+}
+
+int Bar(int x){ Foo(x); }
+
+int main(void) {
+  int i = 0;
+  while (1) {
+    Bar(i++);
+  }
+  return 0;
+}
+$ gcc function.c -g -pthread
+$ sudo ./funclatency.sh $(pidof a.out) 'Foo'
+$ sudo ./stackcount.sh $(pidof a.out) 'Foo'
+```
+
+```
+$ cat alloc.c
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(void) {
+  void *a[20];
+  for (int i = 0; i < 20; ++i) {
+    sleep(1);
+    a[i] = malloc(1);
+  }
+  for (int i = 0; i < 20; ++i) {
+    sleep(1);
+    free(a[i]);
+  }
+  return 0;
+}
+$ gcc alloc.c -g -pthread
+$ sudo ./memleak.sh $(pidof a.out)
 ```
 
 ## Useful links
