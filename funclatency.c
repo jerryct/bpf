@@ -33,12 +33,14 @@ int main(void) {
   relocate_map_fd(funclatency_prog_exit, relocs);
   attach(funclatency_prog_exit, -1, "/sys/kernel/debug/tracing/events/uprobes/funclatency_return/id");
 
+  __u64 previous_count = 0;
   while (1) {
     sleep(1);
 
     const __u64 sum = at(sfd, 0);
     const __u64 count = at(sfd, 1);
-    if (count > 0) {
+    if (count > previous_count) {
+      previous_count = count;
       printf("mean: %llu [us] - count: %llu\n", sum / count, count);
     }
   }
